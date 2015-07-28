@@ -299,6 +299,16 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var results = {};
+
+    return function() {
+      if(results[arguments[0]]) {
+        return results[arguments[0]];
+      } else {
+        results[arguments[0]] = func.apply(this, arguments);
+        return results[arguments[0]];
+      }
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -308,6 +318,13 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = [];
+    for (var i = 2; i < arguments.length; i ++){
+      args.push(arguments[i]);
+    }
+    setTimeout(function() {
+      func.apply(this, args);
+    }, wait);
   };
 
 
@@ -322,6 +339,24 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var arr = array.slice();
+    var result = [];
+    var last;
+
+    for(var i = 0; i < array.length; i ++){
+      last = Math.floor(Math.random() * arr.length);
+      result.push(arr[last])
+
+      if(last === 0) {
+        arr = arr.slice(1)
+      } else if (last === arr.length - 1) {
+        arr = arr.slice(0, arr.length - 1)
+      } else {
+        arr = arr.slice(0, last).concat(arr.slice(last + 1));
+      }
+    }
+
+    return result;
   };
 
 
@@ -336,6 +371,11 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+
+      return _.map(collection, function(item){
+      var method = typeof functionOrKey === 'string' ? item[functionOrKey] : functionOrKey;
+      return method.apply(item, args);
+    })
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -343,6 +383,29 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    var result = [];
+    var smallest = collection.pop();
+    var remainder = [];
+
+    var smallTest = function(array) {
+      _.each(array, function(item) {
+        if(iterator(smallest) < iterator(item)) {
+          remainder.push(item);
+        } else {
+          smallest = item;
+        }
+      })
+      result.push(smallest);
+    }
+
+    smallTest(collection);
+
+    if(remainder.length > 1) {
+      smallTest(remainder);
+    }
+
+    return result;
+
   };
 
   // Zip together two or more arrays with elements of the same index

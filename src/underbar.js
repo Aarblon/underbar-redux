@@ -78,7 +78,7 @@
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
     var result = [];
-    _.each(collection, function(item){
+    _.each(collection, function(item) {
       if(test(item)) {
         result.push(item);
       }
@@ -90,10 +90,10 @@
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-     var result = _.filter(collection, function(item){
-       return !test(item);
+    var result = _.filter(collection, function(item){
+      return !test(item);
     })
-     return result;
+    return result;
   };
 
   // Produce a duplicate-free version of the array.
@@ -195,7 +195,6 @@
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
     iterator = iterator || _.identity;
-
     return !!_.reduce(collection, function(trueSoFar, item){
       return trueSoFar && iterator(item);
     }, true)
@@ -205,8 +204,18 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
-
+    iterator = iterator || _.identity;
+    return !!_.reduce(collection, function(trueSoFar, item){
+      return trueSoFar || iterator(item);
+    }, false)
   };
+
+    // if(_.every(collection, iterator) && iterator(collection[0] === false)){
+    //   return false;
+    // } else {
+    //   return true;
+    // }
+
 
 
   /**
@@ -228,11 +237,25 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for(var i = 1; i < arguments.length; i ++) {
+      for(var key in arguments[i]) {
+        obj[key] = arguments[i][key];
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for(var i =1; i < arguments.length; i++) {
+      for(var key in arguments[i]) {
+        if(obj[key] === undefined){
+          obj[key] = arguments[i][key];
+        }
+      }
+    }
+    return obj;
   };
 
 
